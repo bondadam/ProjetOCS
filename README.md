@@ -1,3 +1,4 @@
+
 # Projet OCS - Groupe 3
 
 - ##### *Munier Rémy*
@@ -8,7 +9,7 @@
 
 ## Description
 
-##### Features:
+### Features
 
 **Deux familles de features:**
 
@@ -33,18 +34,53 @@ Ici nous envisageons aussi à terme de rendre une API libre pour programmer les 
 L'utilisateur choisit un parcours sur son téléphone. A chaque fois qu'il arrive à une intersection, les vibrations sur l'épaulière lui indiqueront la direction dans laquelle il veut tourner. Les épaulières vibrent différamment pour indiquer une notification. Le cycliste s'arrête pour lire son message, décide de faire un détours en conséquence, et tire sur un cordon pour allumer la lumière correspondante à l'arrière car il veut prendre une direction contraire à celle indiquée par son GPS.
 
 
-##### Services :
+### Services 
   
 ## Matériel
 
-##### Capteurs
+### Capteurs
 
 - Capteur de distance à l'arrière
 - Accéléromètre pour les feux de frein et la détection de choc
 - Capteur de luminosité
 - Capteur de force/pression pour le système de cordes
 
-##### Actionneurs
+### Actionneurs
 
 - LEDs
 - Vibrations
+
+### Matériel choisi
+
+Au niveau du matériel, le défi dans ce projet est d'équilibrer les contraintes:
+
+1. De poids, car l'utilisateur risque de porter le sac toute la journée;
+2. D'autonomie, la batterie devant être suffisamment conséquente pour tenir au moins une journée avec charge complête, sans non plus être trop lourde;
+3. D'ergonomie, étant donné qu'il faut trouver comment caser les composants dans le sac sans gêner l'utilisateur, donc avec une place limitée, tout en respectant les deux premières contraintes.
+
+Nous nous sommes orientés vers une Raspberry Pi Zero car sa petite taille et sa consommation basse sont des avantages conséquents et les capteurs que nous utilisons ne nécessitent pas de puissance de calcul démesurée (pas de caméra par exemple).
+
+En revanche, nous anvons choisi le module Grove Base Hat au lieu du Grove Base Hat Zero (conçu spécialement pour la Zero) à cause du nombre insuffisant d'entrées digitales dans le second (seulement 2).
+
+| Nom Produit                                                                                                                    | Nombre | I/O                                                               |
+| ------------------------------------------------------------------------------------------------------------------------------ | ------ | ----------------------------------------------------------------- |
+|                                                                                                                                |        |                                                                   |
+| [Stick 10 LEDs RGB Grove 104020131](https://www.gotronic.fr/art-stick-10-leds-rgb-grove-104020131-29077.htm)                 | 2      | 2 Digital                                                         |
+| [Led 8 mm RGB Grove V2.0 104020048](https://www.gotronic.fr/art-led-8-mm-rgb-grove-v2-0-104020048-27067.htm)                 | 8      | 1 Digital (puis en cascade)                    |
+| [Module vibreur Grove 105020003](https://www.gotronic.fr/art-moteur-haptique-vibreur-grove-105020011-24538.htm)              | 2      | 2 I2C                                                             |
+| [Accéléromètre 3 axes Grove 101020054](https://www.gotronic.fr/art-accelerometre-3-axes-grove-101020054-18957.htm)           | 1      | 1 I2C                                                             |
+| [Télémètre à ultrasons Grove 101020010](https://www.gotronic.fr/art-telemetre-a-ultrasons-grove-101020010-18976.htm)         | 1      | 1 Analog                                                          |
+| [Batterie externe USB V206](https://www.gotronic.fr/art-batterie-externe-usb-v206-28874.htm)                                 | 1      |                                                                   |
+| [Module touche sensitive Grove 101020037](https://www.gotronic.fr/art-module-touche-sensitive-grove-101020037-19049.htm)     | 2      | 2 Digital                                                         |
+| [Détecteur de lumière Grove V1.2 101020132](https://www.gotronic.fr/art-detecteur-de-lumiere-grove-v1-2-101020132-25427.htm) | 1      | 1 Analog                                                          |
+| [Module Grove Base Hat 103030275](https://www.gotronic.fr/art-module-grove-base-hat-103030275-28937.htm)                     | 1      |                                                                   |
+| [Carte Raspberry Pi Zero WH](https://www.gotronic.fr/art-carte-raspberry-pi-zero-wh-27670.htm)                               | 1      | 1 X micro SD, 1 X mini HDMI, 1 X micro USB OTG, 1 X CSI, 1 X GPIO |
+
+
+##### Total I/O
+
+**Disponible**
+4 Analog, 6 Digital, 1 PWM, 3 I2C, 1 UART
+
+**Utilisé**
+1 Analog, 3/4 Digital, 3 I2C UTILISE
