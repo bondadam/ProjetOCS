@@ -77,10 +77,10 @@ En revanche, nous anvons choisi le module Grove Base Hat au lieu du Grove Base H
 | [Carte Raspberry Pi Zero WH](https://www.gotronic.fr/art-carte-raspberry-pi-zero-wh-27670.htm)                               | 1      | 1 X micro SD, 1 X mini HDMI, 1 X micro USB OTG, 1 X CSI, 1 X GPIO |
 
 
-##### Total I/O
+#### Total I/O
 
 **Disponible**
 4 Analog, 6 Digital, 1 PWM, 3 I2C, 1 UART
 
 **Utilisé**
-1 Analog, 3/4 Digital, 3 I2C UTILISE
+1 Analog, 3 ou 4 Digital selon les LEDs, 3 I2C
