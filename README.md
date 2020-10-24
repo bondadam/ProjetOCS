@@ -33,6 +33,15 @@ Ici nous envisageons aussi à terme de rendre une API libre pour programmer les 
 
 L'utilisateur choisit un parcours sur son téléphone. A chaque fois qu'il arrive à une intersection, les vibrations sur l'épaulière lui indiqueront la direction dans laquelle il veut tourner. Les épaulières vibrent différamment pour indiquer une notification. Le cycliste s'arrête pour lire son message, décide de faire un détours en conséquence, et tire sur un cordon pour allumer la lumière correspondante à l'arrière car il veut prendre une direction contraire à celle indiquée par son GPS.
 
+### Architecture and Flowcharts
+
+|   Global Architecture       |
+|-----------------------------|
+|![Ocs-Architecture](images/Ocs-Architecture.png)|
+
+| General Flowchart      | Ergonomic Flowchart      |
+|------------|-------------|
+|![OCS_General_Flowchart](images/OCS_General_Flowchart.png)|![OCS_General_Flowchart](images/OCS_Ergonomic_Flowchart.jpeg)|
 
 ### Services 
   
