@@ -93,3 +93,11 @@ En revanche, nous anvons choisi le module Grove Base Hat au lieu du Grove Base H
 
 **Utilisé**
 1 Analog, 3 ou 4 Digital selon les LEDs, 3 I2C
+
+#### Matériel reçu
+
+- Raspberry Pi Zero x3
+- Grove Base Zero x3
+- Carte Micro SD 8GB x3
+- Chargeur Micro USB x3
+
