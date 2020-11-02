@@ -101,3 +101,13 @@ En revanche, nous anvons choisi le module Grove Base Hat au lieu du Grove Base H
 - Carte Micro SD 8GB x3
 - Chargeur Micro USB x3
 
+### Objet physique
+Première ébauches 3D de l'objet physique qui viendra se coudre dans le sac, basé sur une pi 0 et un grove base hat :
+![ocs-scheme](images/ocs-scheme.png)
+![ocs-scheme](images/ocs-empty.png)
+
+Nous n'avons pas trouvé de model 3D du Grove base hat, et nous sommes donc basé sur le Grove base hat Zero, qui posède les mêmes dimensions mis à part la profondeur qui a étée prise en compte :
+![ocs-scheme](images/ocs-full.png)
+
+Il nous reste à faire un couvercle permettant de laisser passer les connecteurs Grove ainsi que les trous au niveau de ports usb de la raspberry afin de faire passer le cable d'alimentation.
+
