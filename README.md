@@ -105,6 +105,7 @@ En revanche, nous anvons choisi le module Grove Base Hat au lieu du Grove Base H
 Première ébauches 3D de l'objet physique qui viendra se coudre dans le sac, basé sur une pi 0 et un grove base hat :
 ![ocs-scheme](images/ocs-scheme.png)
 ![ocs-scheme](images/ocs-empty.png)
+![ocs-scheme](images/ocs-cap.png)
 
 Nous n'avons pas trouvé de model 3D du Grove base hat, et nous sommes donc basé sur le Grove base hat Zero, qui posède les mêmes dimensions mis à part la profondeur qui a étée prise en compte :
 ![ocs-scheme](images/ocs-full.png)
