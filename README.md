@@ -37,7 +37,7 @@ L'utilisateur choisit un parcours sur son téléphone. A chaque fois qu'il arriv
 
 |   Global Architecture       |
 |-----------------------------|
-|![Ocs-Architecture](images/Ocs-Architecture.png)|
+|![Ocs-Architecture](images/OCS-Arch-it1.jpg)|
 
 | General Flowchart      | Ergonomic Flowchart      |
 |------------|-------------|
@@ -116,8 +116,7 @@ Première ébauches 3D de l'objet physique qui viendra se coudre dans le sac, ba
 ![ocs-scheme](images/ocs-empty.png)
 ![ocs-scheme](images/ocs-cap.png)
 
-Nous n'avons pas trouvé de model 3D du Grove base hat, et nous sommes donc basé sur le Grove base hat Zero, qui posède les mêmes dimensions mis à part la profondeur qui a étée prise en compte :
+Nous n'avons pas trouvé de model 3D du Grove base hat, et nous sommes donc basé sur le Grove base hat Zero, qui posède les mêmes dimensions mis à part la profondeur qui a étée prise en compte par rapport au dimensions données dans la description du produit :
 ![ocs-scheme](images/ocs-full.png)
 
-Il nous reste à faire un couvercle permettant de laisser passer les connecteurs Grove ainsi que les trous au niveau de ports usb de la raspberry afin de faire passer le cable d'alimentation.
 
