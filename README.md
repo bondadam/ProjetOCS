@@ -43,6 +43,15 @@ L'utilisateur choisit un parcours sur son téléphone. A chaque fois qu'il arriv
 |------------|-------------|
 |![OCS_General_Flowchart](images/OCS_General_Flowchart.png)|![OCS_General_Flowchart](images/OCS_Ergonomic_Flowchart.jpeg)|
 
+
+Questions d'architecture:
+
+Over bluetooth ou over TCP/IP ?
+
+-> Première itération over tcp/ip car c'est plus rapide à mettre en place.
+
+2 MQTT Broker avec un bridge, ou un seul MQTT Broker où les deux "bouts" (téléphone et rasp) sont à la fois pub/sub ?
+
 ### Services 
   
 ## Matériel
