@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -14,9 +15,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -29,21 +38,51 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private TextView position_display;
-    private Button send_button;
+    private Button sendBtn;
     private Button orangeBtn;
     private Button redBtn;
+    private Button clignotantsLeftBtn;
+    private Button clignotantsRightBtn;
+    private Button newServerBtn;
+    private EditText address;
 
     private LocationManager locationManager;
+    private LocationListener sacListener;
+    private String ORS_API_KEY = "5b3ce3597851110001cf6248617d247385594bcc9082b43fbdb1be4e";
+
+    // MQTT TOPICS
     private static String CLIGNOTANTS_COLOR = "clignotants/color";
+    private static String CLIGNOTANTS_LEFT = "clignotants/left";
+    private static String CLIGNOTANTS_RIGHT = "clignotants/right";
+
+
+    private static String NAVIGATION = "navigation";
     private MqttAndroidClient mqttAndroidClient;
 
-    private final String serverUri = "tcp://192.168.0.111:1883";
+    private String serverUri = "tcp://192.168.0.111:1883";
+
+    private double longitude;
+    private double latitude;
+
+    private EditText longitudeView;
+    private EditText latitudeView;
+
+    private int currentInstructionNumber;
+    private TextView currentInstructionView;
+    private Button nextInstructionBtn;
+
+    private ArrayList<HashMap<String, String>> instructions;
 
     private String clientId = "ExampleAndroidClient";
     private ArrayList<String> topicsToSubscribeTo = new ArrayList<String>();
@@ -54,11 +93,36 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         this.position_display = findViewById(R.id.position_display);
-        this.send_button = findViewById(R.id.send_button);
+        this.sendBtn = findViewById(R.id.send_button);
         this.orangeBtn = findViewById(R.id.orangeBtn);
         this.redBtn = findViewById(R.id.redBtn);
+        this.clignotantsLeftBtn = findViewById(R.id.clignotantsLeftBtn);
+        this.newServerBtn = findViewById(R.id.newServerBtn);
+        this.address = findViewById(R.id.address);
+        this.currentInstructionNumber = 0;
+        this.latitudeView = findViewById(R.id.latitude);
+        this.longitudeView = findViewById(R.id.longitude);
+        this.currentInstructionView = findViewById(R.id.currentInstruction);
+        this.nextInstructionBtn = findViewById(R.id.nextBtn);
+        this.instructions = new ArrayList<>();
+
+        Intent intent = getIntent();
+
+        // Get the extras (if there are any)
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            if (extras.containsKey("server_uri")) {
+                String uri = extras.getString("server_uri", "");
+                if (uri != ""){
+                    this.serverUri = uri;
+                }
+                extras.clear();
+                // TODO: Do something with the value of isNew.
+            }
+        }
 
         this.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        this.sacListener = new SacLocationListener();
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -70,8 +134,7 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
             return;
         } else {
-            //this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1000, this);
-            //this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1000, this::onLocationChanged);
+            this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1000, this.sacListener);
         }
 
         redBtn.setOnClickListener(new View.OnClickListener() {
@@ -86,9 +149,95 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        clignotantsLeftBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                publishMessage(CLIGNOTANTS_LEFT, "1");
+            }
+        });
+
+        clignotantsRightBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                publishMessage(CLIGNOTANTS_RIGHT, "1");
+            }
+        });
+
+        newServerBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                String new_server_uri = address.getText().toString();
+                Intent intent = getIntent();
+                intent.putExtra("server_uri", new_server_uri);
+                finish();
+                startActivity(intent);
+            }
+        });
+
+        nextInstructionBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // first send current instruction
+
+                currentInstructionNumber++;
+                if (currentInstructionNumber >= instructions.size()){
+                    currentInstructionView.setText("You are at your destination!");
+                } else {
+                    HashMap<String, String> instruction  = instructions.get(currentInstructionNumber);
+                    currentInstructionView.setText(instruction.get("instruction"));
+                    //publishMessage(NAVIGATION, String.format("%s/%s/%s}", instruction.get("instruction"), instruction.get("type"), instruction.get("exit_number")));
+                    publishMessage(NAVIGATION, String.format("%s,%s}", instruction.get("type"), instruction.get("exit_number")));
+                }
+            }
+        });
+
+        sendBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                String destination_latitude = latitudeView.getText().toString();
+                String destination_longitude = longitudeView.getText().toString();
+                // Instantiate the RequestQueue.
+                RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+                String url = String.format("https://api.openrouteservice.org/v2/directions/driving-car?api_key=%s&start=%f,%f&end=%s,%s", ORS_API_KEY, longitude, latitude, destination_longitude, destination_latitude);
+                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                Toast.makeText(getApplicationContext(), "Instructions to destination received." , Toast.LENGTH_SHORT).show();
+                                //textView.setText("Response is: "+ response.substring(0,500));
+                                JSONObject jsObj = null;
+                                instructions = new ArrayList<>();
+                                currentInstructionNumber = 0;
+                                try {
+                                    jsObj = new JSONObject(response);
+                                    JSONObject feature = jsObj.getJSONArray("features").getJSONObject(0);
+                                    JSONArray steps = feature.getJSONObject("properties").getJSONArray("segments").getJSONObject(0).getJSONArray("steps");
+                                    for (int i = 0; i < steps.length(); i++) {
+                                        HashMap<String, String> step = new HashMap<>();
+                                        JSONObject obj = steps.getJSONObject(i);
+                                        step.put("instruction", obj.getString("instruction"));
+                                        step.put("type", Integer.toString(obj.getInt("type")));
+                                        step.put("exit_number", Integer.toString(obj.optInt("exit_number", -1)));
+                                        instructions.add(step);
+                                    }
+                                    currentInstructionView.setText(instructions.get(0).get("instruction"));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                    Toast.makeText(getApplicationContext(), "Error while handling instructions: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), "Error getting instructions: " + error.getMessage() , Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+// Add the request to the RequestQueue.
+                queue.add(stringRequest);
+            }
+        });
+
         // MQTT
 
-        this.topicsToSubscribeTo.add(CLIGNOTANTS_COLOR);
+        //this.topicsToSubscribeTo.add(CLIGNOTANTS_COLOR);
+        //this.topicsToSubscribeTo.add(NAVIGATION);
+
 
         clientId = clientId + System.currentTimeMillis();
         mqttAndroidClient = new MqttAndroidClient(getApplicationContext(), serverUri, clientId);
@@ -206,14 +355,36 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (grantResults.length == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
             // All permissions have been granted
-            //this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1000, this::onLocationChanged);
+            this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1000, this.sacListener);
         }
     }
 
 
-    public void onLocationChanged(Location location) {
-        this.position_display.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
+    private class SacLocationListener implements LocationListener {
+        @Override
+        public void onLocationChanged(Location location) {
+            position_display.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
     }
 
 
+
 }
+
