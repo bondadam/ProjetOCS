@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private static String NAVIGATION = "navigation";
     private MqttAndroidClient mqttAndroidClient;
 
-    private String serverUri = "tcp://192.168.0.111:1883";
+    private String serverUri = "tcp://192.168.43.146:1883";
 
     private double longitude;
     private double latitude;
@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
                 String uri = extras.getString("server_uri", "");
                 if (uri != ""){
                     this.serverUri = uri;
+                    this.address.setText(uri);
                 }
                 extras.clear();
                 // TODO: Do something with the value of isNew.
